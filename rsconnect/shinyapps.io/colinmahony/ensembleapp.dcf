@@ -1,0 +1,12 @@
+name: EnsembleApp
+title: EnsembleApp
+username:
+account: colinmahony
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 1909298
+bundleId: 3392046
+url: https://colinmahony.shinyapps.io/EnsembleApp/
+when: 1594750861.49411
+asMultiple: FALSE
+asStatic: FALSE

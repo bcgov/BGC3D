@@ -1,0 +1,12 @@
+name: BGC3D
+title: BGC3D
+username:
+account: colinmahony
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 3025731
+bundleId: 3746388
+url: https://colinmahony.shinyapps.io/BGC3D/
+when: 1602791627.52756
+asMultiple: FALSE
+asStatic: FALSE

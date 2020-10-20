@@ -1,0 +1,12 @@
+name: App-BGCproj-EDA
+title: App-BGCproj-EDA
+username:
+account: colinmahony
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 2964260
+bundleId: 3746109
+url: https://colinmahony.shinyapps.io/App-BGCproj-EDA/
+when: 1602786446.02516
+asMultiple: FALSE
+asStatic: FALSE
