@@ -1,0 +1,40 @@
+---
+title: "Methods"
+author: "Colin Mahony"
+date: "27/11/2020"
+output: html_document
+---
+
+## About this app
+
+This is a draft app to explore biogeoclimatic (BGC) units and projections in climate space. Currently the app is available only to invited users within the BC government. 
+
+### Contributors
+App created by:<br>
+Colin Mahony<br>
+Research Climatologist<br>
+BC Ministry of Forests, Lands, Natural Resource Operations and Rural Development<br>
+colin.mahony@gov.bc.ca
+
+### Methods
+
+**Climate Data**--All climate data are derived from [ClimateBC](http://climatebc.ca/), a public climate downscaling software developed by Tongli Wang at the UBC Centre for Forest Conservation Genetics. 
+
+**Mean climate of BGC units**--Each biogeoclimatic unit is represented by a single point in the climate space; this is the mean of all 2km grid points within the geographic boundary of the BGC unit 
+
+**Spatial range of individual BGC units**--select one or two BGC units to see the data for 200 randomly-selected points within the boundary of that unit. This gives a sense of how big the unit(s) is/are in climate space. 
+
+**Non-BC BGC units**--This shows draft BGC subzones for Alberta and the Western US. 
+
+**Variable sets**--Currently there are only two variable sets. I intend to add a CCISS variable set and ideally to have a user-specified variable set
+
+**Principal components analysis**--All ratio variables (variables that have a minimum of zero; e.g., Precipitation, degree-days) are log-transformed prior to principal components analysis. 
+
+**Equal-scale axes**--By default, the climate space is a cube with unequal axes; this is preferable for displaying variables with different unit scales (e.g., degrees vs. millimeters). However, sometimes it is more meaningful to scale the climate space with equal-scale axes, such as for principal components where the relative variance of the PCs is relevant. 
+
+**Variable correlations**--This toggle adds biplot arrows to the climate space. these arrows are calculated by calculating the spatial correlation between each variable in the variable set with each axis of the climate space. the relative length of the arrow indicates the strength of the correlation.   
+
+**Climate Variables**--Although there are many types of climate variables in this app, values for many of these variables are estimated from monthly values of three basic climate elements: mean daily maximum temperature (T<sub>max</sub>), mean daily minimum temperature (T<sub>min</sub>), and precipitation (PPT). The method for estimating derived variables is given in [Wang et al. (2016)](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0156720). Since other climate elements (e.g., degree-days, precipitation as snow, frost-free days, cumulative moisture deficit) are not calculated directly from daily data, some caution is warranted. 
+
+**Climate projections**--when "show shifts to future climates" is toggled, the app shows the climate trajectories for the 15 climate models that are available in ClimateBC, for a single BGC unit. 
+

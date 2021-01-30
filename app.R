@@ -12,7 +12,6 @@ library(rgl)
 # library(devtools)
 # install_github("rgl", "trestletech", "js-class")
 
-# setwd("C:\\Users\\CMAHONY\\OneDrive - Government of BC\\Projects\\2020_BGCProjections\\app_3D\\BGC3D")
 
 # ------------------------------------------
 # Load the input data
@@ -46,49 +45,30 @@ Geog.sample.WNA <- read.csv("data/Clim.sample.WNA.csv")[,c(3,2,4)]
 Geog.BGCs.BC.future <- read.csv("data/Clim.BGCs.BC.future.csv")[,c(6,5,7)]
 
 # Climate Data
-Clim.BGCs.BC <- read.csv("data/Clim.BGCs.BC.csv")[,-c(1:4)]
-Clim.BGCs.WNA <- read.csv("data/Clim.BGCs.WNA.csv")[,-c(1:4)]
-Clim.BGCs.BC.2004 <- read.csv("data/Clim.BGCs.BC.2004.csv")[,-c(1:4)]
-Clim.sample.BC <- read.csv("data/Clim.sample.BC.csv")[,-c(1:4)]
-Clim.sample.WNA <- read.csv("data/Clim.sample.WNA.csv")[,-c(1:4)]
-Clim.BGCs.BC.future <- read.csv("data/Clim.BGCs.BC.future.csv")[,-c(1:7)]
-Clim.BGCs.BC.future <- Clim.BGCs.BC.future[which(names(Clim.BGCs.BC.future)%in%names(Clim.BGCs.BC))]
+Clim.BGCs.BC.all <- read.csv("data/Clim.BGCs.BC.csv")[,-c(1:4)]
+Clim.BGCs.WNA.all <- read.csv("data/Clim.BGCs.WNA.csv")[,-c(1:4)]
+Clim.BGCs.BC.2004.all <- read.csv("data/Clim.BGCs.BC.2004.csv")[,-c(1:4)]
+Clim.sample.BC.all <- read.csv("data/Clim.sample.BC.csv")[,-c(1:4)]
+Clim.sample.WNA.all <- read.csv("data/Clim.sample.WNA.csv")[,-c(1:4)]
+Clim.BGCs.BC.future.all <- read.csv("data/Clim.BGCs.BC.future.csv")[,-c(1:7)]
+Clim.BGCs.BC.future.all <- Clim.BGCs.BC.future.all[which(names(Clim.BGCs.BC.future.all)%in%names(Clim.BGCs.BC.all))]
 
-# reorder variables
-Clim.BGCs.BC <- Clim.BGCs.BC[,order(names(Clim.BGCs.BC))]
-Clim.BGCs.WNA <- Clim.BGCs.WNA[,order(names(Clim.BGCs.WNA))]
-Clim.BGCs.BC.2004 <- Clim.BGCs.BC.2004[,order(names(Clim.BGCs.BC.2004))]
-Clim.sample.BC <- Clim.sample.BC[,order(names(Clim.sample.BC))]
-Clim.sample.WNA <- Clim.sample.WNA[,order(names(Clim.sample.WNA))]
-Clim.BGCs.BC.future <- Clim.BGCs.BC.future[,order(names(Clim.BGCs.BC.future))]
+# # reorder variables
+# Clim.BGCs.BC.all  <- Clim.BGCs.BC.all [,order(names(Clim.BGCs.BC.all ))]
+# Clim.BGCs.WNA.all  <- Clim.BGCs.WNA.all [,order(names(Clim.BGCs.WNA.all ))]
+# Clim.BGCs.BC.2004.all  <- Clim.BGCs.BC.2004.all [,order(names(Clim.BGCs.BC.2004.all ))]
+# Clim.sample.BC.all  <- Clim.sample.BC.all [,order(names(Clim.sample.BC.all ))]
+# Clim.sample.WNA.all  <- Clim.sample.WNA.all [,order(names(Clim.sample.WNA.all ))]
+# Clim.BGCs.BC.future.all  <- Clim.BGCs.BC.future.all [,order(names(Clim.BGCs.BC.future.all ))]
 
-# # remove a variable
-# Clim.BGCs.BC <- Clim.BGCs.BC[,-which(names(Clim.BGCs.BC)=="MCMT")]
-# Clim.BGCs.WNA <- Clim.BGCs.WNA[,-which(names(Clim.BGCs.WNA)=="MCMT")]
-# Clim.BGCs.BC.2004 <- Clim.BGCs.BC.2004[,-which(names(Clim.BGCs.BC.2004)=="MCMT")]
-# Clim.sample.BC <- Clim.sample.BC[,-which(names(Clim.sample.BC)=="MCMT")]
-# Clim.sample.WNA <- Clim.sample.WNA[,-which(names(Clim.sample.WNA)=="MCMT")]
-# Clim.BGCs.BC.future <- Clim.BGCs.BC.future[,-which(names(Clim.BGCs.BC.future)=="MCMT")]
-
-names(Clim.BGCs.BC)
-names(Clim.BGCs.BC.2004)
-
-# PC Scores with log transformation
-logT.clim <- function(x){
-  zerolim <- grep("MAP|PPT|PAS|DD|CMD|NFFD|FFP|MSP|Eref",names(x))
-  for(i in zerolim){x[which(x[,i]==0),i] <- 1}  #set zero values to one, to facilitate log-transformation
-  x[,zerolim] <- log(x[,zerolim]) #log-transform the zero-limited variables
-  return(x)
-}
-pca.BGCs <- prcomp(logT.clim(Clim.BGCs.BC), scale=T)
-# Cor <- cor(Clim.BGCs.BC,predict(pca.BGCs, logT.clim(Clim.BGCs.BC)))
-Clim.BGCs.BC <- cbind(predict(pca.BGCs, logT.clim(Clim.BGCs.BC))[,1:3], Clim.BGCs.BC)
-Clim.BGCs.WNA <- cbind(predict(pca.BGCs, logT.clim(Clim.BGCs.WNA))[,1:3],Clim.BGCs.WNA)
-Clim.BGCs.BC.2004 <- cbind(predict(pca.BGCs, logT.clim(Clim.BGCs.BC.2004))[,1:3],Clim.BGCs.BC.2004)
-Clim.sample.BC <- cbind(predict(pca.BGCs, logT.clim(Clim.sample.BC))[,1:3],Clim.sample.BC)
-Clim.sample.WNA <- cbind(predict(pca.BGCs, logT.clim(Clim.sample.WNA))[,1:3],Clim.sample.WNA)
-Clim.BGCs.BC.future <- cbind(predict(pca.BGCs, logT.clim(Clim.BGCs.BC.future))[,1:3],Clim.BGCs.BC.future)
-
+# # remove CMD (too skewed for PCA)
+# Clim.BGCs.BC <- Clim.BGCs.BC[-grep("CMD", names(Clim.BGCs.BC))]
+# Clim.BGCs.WNA <- Clim.BGCs.WNA[-grep("CMD", names(Clim.BGCs.WNA))]
+# Clim.BGCs.BC.2004 <- Clim.BGCs.BC.2004[-grep("CMD", names(Clim.BGCs.BC.2004))]
+# Clim.sample.BC <- Clim.sample.BC[-grep("CMD", names(Clim.sample.BC))]
+# Clim.sample.WNA <- Clim.sample.WNA[-grep("CMD", names(Clim.sample.WNA))]
+# Clim.BGCs.BC.future <- Clim.BGCs.BC.future[-grep("CMD", names(Clim.BGCs.BC.future))]
+# 
 # # PC Scores without log transformation
 # pca.BGCs <- prcomp(Clim.BGCs.BC, scale=T)
 # # Cor <- cor(Clim.BGCs.BC,predict(pca.BGCs, logT.clim(Clim.BGCs.BC)))
@@ -107,32 +87,9 @@ zones.WNA <- rep(NA, length(BGCs.WNA))
 for(i in BGCcolors$classification){ zones.WNA[grep(i,BGCs.WNA)] <- i }
 zones.WNA <- factor(zones.WNA, BGCcolors$classification)
 
-variables <- names(Clim.BGCs.BC)
-variable.names <- read.csv("data/Variables_ClimateBC.csv")
-
-variable.types <- rep(NA, length(variables))
-variable.types[grep("PPT|DD|PAS|NFFD|Eref|FFP|CMD|MAP|MSP|AHM|SHM|Rad|MAR", variables)] <- "ratio"
-variable.types[grep("Tmax|Tmin|Tave|MAT|MWMT|MCMT|TD|EMT|EXT|bFFP|eFFP|PC", variables)] <- "interval"
-variable.types[grep("RH", variables)] <- "pct"
-
-# 
-# test <- Clim.sample.BC[which(BGCs.sample.BC=="CWHvm1"),]
-# x <- test[,1]
-# y <- test[,2]
-# plot(x,y)
-# x <- test[,2]
-# y <- test[,3]
-# plot(x,y)
-# 
-# for(i in 4:length(test)){
-#   par(mar=c(2,2,0,0), mfrow=c(5,7), mgp=c(0.25, 0,0))
-#   for(j in 4:length(test)){
-#     x <- test[,i]
-#     y <- test[,j]
-#     plot(x,y, xaxt="n", yaxt="n", xlab=names(test)[i], ylab=names(test)[j])
-#   }
-# }
-
+vars.cbst <- c("Latitude",  "MAT", "MCMT", "TD", "MAP", "MSP", "DD5", "PAS")
+vars.basic <- paste(rep(c("Tmin", "Tmax", "PPT"), each=4), rep(c("wt", "sp", "sm", "at"), times=4), sep="_")
+varsets <- c("basic", "cbst")
 
 
 
@@ -145,7 +102,7 @@ ui <- fluidPage(
              tabPanel("3D", 
                       fluidRow(
                         column(2,
-                               helpText("Biogeoclimatic units in climate space"),
+                               helpText("Use mouse to spin and zoom"),
                                
                                tags$head(tags$script('$(document).on("shiny:connected", function(e) {
                             Shiny.onInputChange("innerWidth", window.innerWidth);
@@ -159,8 +116,6 @@ ui <- fluidPage(
                                
                                checkboxInput("labels", label = "Show BGC labels", value = TRUE),
                                
-                               checkboxInput("exotic", label = "Include BGC units outside BC", value = FALSE),
-                               
                                selectInput("focal1", 
                                            label = "show spatial range of a BGC unit",
                                            choices = as.list(c("none", as.character(BGCs.BC))),
@@ -171,49 +126,95 @@ ui <- fluidPage(
                                            choices = as.list(c("none", as.character(BGCs.BC))),
                                            selected = "none"),
                                
-                               selectInput("focalWNA", 
-                                           label = "show spatial range of a non-BC BGC unit",
-                                           choices = as.list(c("none", as.character(BGCs.WNA))),
-                                           selected = "none"),
+                               checkboxInput("exotic", label = "Include BGC units outside BC", value = FALSE),
+                               
+                               conditionalPanel(
+                                 condition = "input.exotic == true",
+                                 
+                                 selectInput("focalWNA", 
+                                             label = "show spatial range of a non-BC BGC unit",
+                                             choices = as.list(c("none", as.character(BGCs.WNA))),
+                                             selected = "none"),
+                                 
+                               ),
+                               
+                               conditionalPanel(
+                                 condition = "input.map == false",
+                                 
+                                 radioButtons("vars", inline = T, 
+                                            label = "Choose a variable set",
+                                            choices = list("Basic" = 1, "CBST" = 2),
+                                            selected = 2),
                                
                                checkboxInput("iso", label = "Equal-scale axes (recommended for PCs)", value = FALSE),
                                
                                checkboxInput("biplot", label = "Show variable correlations", value = FALSE),
                                
-                               selectInput("var1", 
-                                           label = "Choose the primary variable",
-                                           choices = as.list(variables),
-                                           selected = "PC1"),
+                               conditionalPanel(
+                                 condition = "input.vars == 1",
+                                 
+                                 selectInput("var1.1", 
+                                             label = "Choose the primary variable",
+                                             choices = as.list(c("PC1", "PC2", "PC3", vars.basic)),
+                                             selected = "PC1"),
+                                 
+                                 selectInput("var2.1", 
+                                             label = "Choose the secondary variable",
+                                             choices = as.list(c("PC1", "PC2", "PC3", vars.basic)),
+                                             selected = "PC2"),
+                                 
+                                 selectInput("var3.1", 
+                                             label = "Choose the tertiary variable",
+                                             choices = as.list(c("PC1", "PC2", "PC3", vars.basic)),
+                                             selected = "PC3"),
+                                 
+                               ),
                                
-                               selectInput("var2", 
-                                           label = "Choose the secondary variable",
-                                           choices = as.list(variables),
-                                           selected = "PC2"),
+                               conditionalPanel(
+                                 condition = "input.vars == 2",
+                                 
+                                 selectInput("var1.2", 
+                                             label = "Choose the primary variable",
+                                             choices = as.list(c("PC1", "PC2", "PC3", vars.cbst)),
+                                             selected = "PC1"),
+                                 
+                                 selectInput("var2.2", 
+                                             label = "Choose the secondary variable",
+                                             choices = as.list(c("PC1", "PC2", "PC3", vars.cbst)),
+                                             selected = "PC2"),
+                                 
+                                 selectInput("var3.2", 
+                                             label = "Choose the tertiary variable",
+                                             choices = as.list(c("PC1", "PC2", "PC3", vars.cbst)),
+                                             selected = "PC3"),
+                                 
+                               ),
                                
-                               selectInput("var3", 
-                                           label = "Choose the tertiary variable",
-                                           choices = as.list(variables),
-                                           selected = "PC3"),
                                
-                               checkboxInput("recent", label = "Show shift to 1991-2019 climate", value = FALSE),
+                               checkboxInput("recent", label = "Show shift to 2001-2019 climate", value = FALSE),
                                
                                checkboxInput("future", label = "Show shifts to future climates", value = FALSE),
                                
-                               selectInput("focal", 
-                                           label = "Choose a focal BGC unit",
-                                           choices = as.list(c(as.character(BGCs.BC))),
-                                           selected = "IDFdk3"),
-                               
-                               radioButtons("proj.year",
-                                            label = "Choose a future period",
-                                            choices = list("2011-2040" = 1, "2041-2070" = 2, "2071-2100" = 3),
-                                            selected = 1),
-                               
-                               radioButtons("rcp",
-                                            label = "Choose an emissions scenario",
-                                            choices = list("RCP4.5" = 1, "RCP8.5" = 2),
-                                            selected = 1)
-                               
+                               conditionalPanel(
+                                 condition = "input.future == true",
+                                 
+                                 selectInput("focal", 
+                                             label = "Choose a focal BGC unit",
+                                             choices = as.list(c(as.character(BGCs.BC))),
+                                             selected = "BGxh1"),
+                                 
+                                 radioButtons("proj.year", inline = T,
+                                              label = "Choose a future period",
+                                              choices = list("2011-2040" = 1, "2041-2070" = 2, "2071-2100" = 3),
+                                              selected = 1),
+                                 
+                                 radioButtons("rcp", inline = T,
+                                              label = "Choose an emissions scenario",
+                                              choices = list("RCP4.5" = 1, "RCP8.5" = 2),
+                                              selected = 1)
+
+                               ),
+                               ),
                         ),    
                         
                         column(10, 
@@ -239,7 +240,30 @@ ui <- fluidPage(
                                )
                         )
                       )
+             ),
+             
+             tabPanel("About",
+                      
+                      includeMarkdown("about.Rmd"),
+                      
+                      column(width = 12,
+                             style = "background-color:#003366; border-top:2px solid #fcba19;",
+                             
+                             tags$footer(class="footer",
+                                         tags$div(class="container", style="display:flex; justify-content:center; flex-direction:column; text-align:center; height:46px;",
+                                                  tags$ul(style="display:flex; flex-direction:row; flex-wrap:wrap; margin:0; list-style:none; align-items:center; height:100%;",
+                                                          tags$li(a(href="https://www2.gov.bc.ca/gov/content/home", "Home", style="font-size:1em; font-weight:normal; color:white; padding-left:5px; padding-right:5px; border-right:1px solid #4b5e7e;")),
+                                                          tags$li(a(href="https://www2.gov.bc.ca/gov/content/home/disclaimer", "Disclaimer", style="font-size:1em; font-weight:normal; color:white; padding-left:5px; padding-right:5px; border-right:1px solid #4b5e7e;")),
+                                                          tags$li(a(href="https://www2.gov.bc.ca/gov/content/home/privacy", "Privacy", style="font-size:1em; font-weight:normal; color:white; padding-left:5px; padding-right:5px; border-right:1px solid #4b5e7e;")),
+                                                          tags$li(a(href="https://www2.gov.bc.ca/gov/content/home/accessibility", "Accessibility", style="font-size:1em; font-weight:normal; color:white; padding-left:5px; padding-right:5px; border-right:1px solid #4b5e7e;")),
+                                                          tags$li(a(href="https://www2.gov.bc.ca/gov/content/home/copyright", "Copyright", style="font-size:1em; font-weight:normal; color:white; padding-left:5px; padding-right:5px; border-right:1px solid #4b5e7e;")),
+                                                          tags$li(a(href="https://www2.gov.bc.ca/StaticWebResources/static/gov3/html/contact-us.html", "Contact", style="font-size:1em; font-weight:normal; color:white; padding-left:5px; padding-right:5px; border-right:1px solid #4b5e7e;"))
+                                                  )
+                                         )
+                             )
+                      )
              )
+             
   )
 )
 
@@ -250,6 +274,39 @@ server <- function(input, output) {
   
   
   output$plot <- renderRglwidget({
+    
+    variables <- c("PC1", "PC2", "PC3", get(paste("vars", varsets[as.numeric(input$vars)], sep=".")))
+    variable.names <- read.csv("data/Variables_ClimateBC.csv")
+    
+    variable.types <- rep(NA, length(variables))
+    variable.types[grep("PPT|DD|PAS|NFFD|Eref|FFP|CMD|MAP|MSP|AHM|SHM|Rad|MAR", variables)] <- "ratio"
+    variable.types[grep("Tmax|Tmin|Tave|MAT|MWMT|MCMT|TD|EMT|EXT|bFFP|eFFP|PC", variables)] <- "interval"
+    variable.types[grep("RH", variables)] <- "pct"
+    
+    
+    # reorder variables
+    Clim.BGCs.BC <- Clim.BGCs.BC.all[,which(names(Clim.BGCs.BC.all)%in%variables)]
+    Clim.BGCs.WNA <- Clim.BGCs.WNA.all[,which(names(Clim.BGCs.WNA.all)%in%variables)]
+    Clim.BGCs.BC.2004 <- Clim.BGCs.BC.2004.all[,which(names(Clim.BGCs.BC.2004.all)%in%variables)]
+    Clim.sample.BC <- Clim.sample.BC.all[,which(names(Clim.sample.BC.all)%in%variables)]
+    Clim.sample.WNA <- Clim.sample.WNA.all[,which(names(Clim.sample.WNA.all)%in%variables)]
+    Clim.BGCs.BC.future <- Clim.BGCs.BC.future.all[,which(names(Clim.BGCs.BC.future.all)%in%variables)]
+    
+    # PC Scores with log transformation
+    logT.clim <- function(x){
+      zerolim <- grep("MAP|PPT|PAS|DD|CMD|NFFD|FFP|MSP|Eref",names(x))
+      for(i in zerolim){x[which(x[,i]==0),i] <- 1}  #set zero values to one, to facilitate log-transformation
+      x[,zerolim] <- log(x[,zerolim]) #log-transform the zero-limited variables
+      return(x)
+    }
+    pca.BGCs <- prcomp(logT.clim(Clim.BGCs.BC), scale=T)
+    # Cor <- cor(Clim.BGCs.BC,predict(pca.BGCs, logT.clim(Clim.BGCs.BC)))
+    Clim.BGCs.BC <- cbind(predict(pca.BGCs, logT.clim(Clim.BGCs.BC))[,1:3], Clim.BGCs.BC)
+    Clim.BGCs.WNA <- cbind(predict(pca.BGCs, logT.clim(Clim.BGCs.WNA))[,1:3],Clim.BGCs.WNA)
+    Clim.BGCs.BC.2004 <- cbind(predict(pca.BGCs, logT.clim(Clim.BGCs.BC.2004))[,1:3],Clim.BGCs.BC.2004)
+    Clim.sample.BC <- cbind(predict(pca.BGCs, logT.clim(Clim.sample.BC))[,1:3],Clim.sample.BC)
+    Clim.sample.WNA <- cbind(predict(pca.BGCs, logT.clim(Clim.sample.WNA))[,1:3],Clim.sample.WNA)
+    Clim.BGCs.BC.future <- cbind(predict(pca.BGCs, logT.clim(Clim.BGCs.BC.future))[,1:3],Clim.BGCs.BC.future)
     
     if(input$map == T){
       
@@ -328,9 +385,9 @@ server <- function(input, output) {
     proj.year <-  proj.years[as.numeric(input$proj.year)]
     rcp <- rcps[as.numeric(input$rcp)]
     
-    var1 <- input$var1
-    var2 <- input$var2
-    var3 <- input$var3
+    var1 <- if(input$vars==1) input$var1.1 else input$var1.2
+    var2 <- if(input$vars==1) input$var2.1 else input$var2.2
+    var3 <- if(input$vars==1) input$var3.1 else input$var3.2
     variable.type1 <- variable.types[which(variables==var1)]
     variable.type2 <- variable.types[which(variables==var2)]
     variable.type3 <- variable.types[which(variables==var3)]
