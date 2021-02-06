@@ -216,3 +216,7 @@ Tmin09,September mean daily minimum temperature (deg. C),September,Monthly,Raw
 Tmin10,October mean daily minimum temperature (deg. C),October,Monthly,Raw
 Tmin11,November mean daily minimum temperature (deg. C),November,Monthly,Raw
 Tmin12,December mean daily minimum temperature (deg. C),December,Monthly,Raw
+CMD.total,two-year cumulative Hargreaves climatic moisture deficit,Annual,Annual,Log
+PPT_JAS,July-Aug-Sept precipitation,Annual,Annual,Log
+CMDMax,Annual maximum Hargreaves climatic moisture deficit,Annual,Annual,Log
+PPT_MJ,May-June precipitation,Annual,Annual,Log

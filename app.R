@@ -7,7 +7,12 @@ library(rgl)
 # library(leaflet)
 # library(htmlwidgets)
 # library(leaflet.opacity)
-# library(sf)
+library(sf)
+library(leaflet)
+library(leafem)
+library(htmlwidgets)
+library(leaflet.opacity)
+library(raster)
 # install.packages("devtools")
 # library(devtools)
 # install_github("rgl", "trestletech", "js-class")
@@ -89,9 +94,18 @@ zones.WNA <- factor(zones.WNA, BGCcolors$classification)
 
 vars.cbst <- c("Latitude",  "MAT", "MCMT", "TD", "MAP", "MSP", "DD5", "PAS")
 vars.basic <- paste(rep(c("Tmin", "Tmax", "PPT"), each=4), rep(c("wt", "sp", "sm", "at"), times=4), sep="_")
-varsets <- c("basic", "cbst")
+vars.cciss <- c("CMD.total", "DD5_sp", "PPT_JAS", "bFFP", "MCMT", "AHM", "CMD_sp", "CMDMax", "DD5", "DD5_sm", "Eref_sm", "Eref_sp", "MWMT", "NFFD", "PAS_sp", "PAS_wt", "PPT_MJ", "SHM", "Tmax_sm")
+varsets <- c("basic", "cbst", "cciss")
 
+variable.names <- read.csv("data/Variables_ClimateBC.csv")
 
+## SPATIAL DATA
+bgc.simple <- st_read("data/bgc.simple.shp")
+bgc.maprecord <- as.character(bgc.simple$BGC)
+zone.maprecord <- bgc.maprecord
+for(i in BGCcolors$classification){ zone.maprecord[grep(i,bgc.maprecord)] <- i }
+bgc.list <- sort(unique(bgc.maprecord))
+zone.list <- sort(unique(zone.maprecord))
 
 # ------------------------------------------
 # Define UI 
@@ -143,8 +157,8 @@ ui <- fluidPage(
                                  
                                  radioButtons("vars", inline = T, 
                                             label = "Choose a variable set",
-                                            choices = list("Basic" = 1, "CBST" = 2),
-                                            selected = 2),
+                                            choices = list("Basic" = 1, "CBST" = 2, "CCISS"=3),
+                                            selected = 1),
                                
                                checkboxInput("iso", label = "Equal-scale axes (recommended for PCs)", value = FALSE),
                                
@@ -242,6 +256,55 @@ ui <- fluidPage(
                       )
              ),
              
+             tabPanel("Find-a-BEC",
+                      sidebarLayout(
+                        sidebarPanel(
+                          helpText("Choose a BGC zone or subzone-variant to show it on the map"),
+                          
+                          tags$head(tags$script('$(document).on("shiny:connected", function(e) {
+                            Shiny.onInputChange("innerWidth", window.innerWidth);
+                            });
+                            $(window).resize(function(e) {
+                            Shiny.onInputChange("innerWidth", window.innerWidth);
+                            });
+                            ')),
+                          
+                          selectInput("showbgc", 
+                                      label = "Choose a BGC subzone-variant",
+                                      choices = as.list(c("none", bgc.list)),
+                                      selected = "none"),
+                          
+                          selectInput("showzone", 
+                                      label = "Choose a BGC zone",
+                                      choices = as.list(c("none", zone.list)),
+                                      selected = "none"),
+                          
+                        ),    
+                        
+                        mainPanel(
+                          
+                          leafletOutput(outputId = "becmap", height="86vh")
+                          
+                        )
+                      ),
+                      column(width = 12,
+                             style = "background-color:#003366; border-top:2px solid #fcba19;",
+                             
+                             tags$footer(class="footer",
+                                         tags$div(class="container", style="display:flex; justify-content:center; flex-direction:column; text-align:center; height:46px;",
+                                                  tags$ul(style="display:flex; flex-direction:row; flex-wrap:wrap; margin:0; list-style:none; align-items:center; height:100%;",
+                                                          tags$li(a(href="https://www2.gov.bc.ca/gov/content/home", "Home", style="font-size:1em; font-weight:normal; color:white; padding-left:5px; padding-right:5px; border-right:1px solid #4b5e7e;")),
+                                                          tags$li(a(href="https://www2.gov.bc.ca/gov/content/home/disclaimer", "Disclaimer", style="font-size:1em; font-weight:normal; color:white; padding-left:5px; padding-right:5px; border-right:1px solid #4b5e7e;")),
+                                                          tags$li(a(href="https://www2.gov.bc.ca/gov/content/home/privacy", "Privacy", style="font-size:1em; font-weight:normal; color:white; padding-left:5px; padding-right:5px; border-right:1px solid #4b5e7e;")),
+                                                          tags$li(a(href="https://www2.gov.bc.ca/gov/content/home/accessibility", "Accessibility", style="font-size:1em; font-weight:normal; color:white; padding-left:5px; padding-right:5px; border-right:1px solid #4b5e7e;")),
+                                                          tags$li(a(href="https://www2.gov.bc.ca/gov/content/home/copyright", "Copyright", style="font-size:1em; font-weight:normal; color:white; padding-left:5px; padding-right:5px; border-right:1px solid #4b5e7e;")),
+                                                          tags$li(a(href="https://www2.gov.bc.ca/StaticWebResources/static/gov3/html/contact-us.html", "Contact", style="font-size:1em; font-weight:normal; color:white; padding-left:5px; padding-right:5px; border-right:1px solid #4b5e7e;"))
+                                                  )
+                                         )
+                             )
+                      )
+             ),
+             
              tabPanel("About",
                       
                       includeMarkdown("about.Rmd"),
@@ -276,13 +339,11 @@ server <- function(input, output) {
   output$plot <- renderRglwidget({
     
     variables <- c("PC1", "PC2", "PC3", get(paste("vars", varsets[as.numeric(input$vars)], sep=".")))
-    variable.names <- read.csv("data/Variables_ClimateBC.csv")
     
     variable.types <- rep(NA, length(variables))
     variable.types[grep("PPT|DD|PAS|NFFD|Eref|FFP|CMD|MAP|MSP|AHM|SHM|Rad|MAR", variables)] <- "ratio"
     variable.types[grep("Tmax|Tmin|Tave|MAT|MWMT|MCMT|TD|EMT|EXT|bFFP|eFFP|PC", variables)] <- "interval"
     variable.types[grep("RH", variables)] <- "pct"
-    
     
     # reorder variables
     Clim.BGCs.BC <- Clim.BGCs.BC.all[,which(names(Clim.BGCs.BC.all)%in%variables)]
@@ -295,7 +356,7 @@ server <- function(input, output) {
     # PC Scores with log transformation
     logT.clim <- function(x){
       zerolim <- grep("MAP|PPT|PAS|DD|CMD|NFFD|FFP|MSP|Eref",names(x))
-      for(i in zerolim){x[which(x[,i]==0),i] <- 1}  #set zero values to one, to facilitate log-transformation
+      for(i in zerolim){x[which(x[,i]<1),i] <- 1}  #set zero values to one, to facilitate log-transformation
       x[,zerolim] <- log(x[,zerolim]) #log-transform the zero-limited variables
       return(x)
     }
@@ -402,9 +463,10 @@ server <- function(input, output) {
     y.recent <- Clim.BGCs.BC.2004[, which(variables==var2)]
     z.recent <- Clim.BGCs.BC.2004[, which(variables==var3)]
     
-    x.future <- Clim.BGCs.BC.future[which(BGCs.future==input$focal & scenario$rcp==rcp & scenario$proj.year==proj.year), which(variables==var1)]
-    y.future <- Clim.BGCs.BC.future[which(BGCs.future==input$focal & scenario$rcp==rcp & scenario$proj.year==proj.year), which(variables==var2)]
-    z.future <- Clim.BGCs.BC.future[which(BGCs.future==input$focal & scenario$rcp==rcp & scenario$proj.year==proj.year), which(variables==var3)]
+    bgc.focal <- input$focal
+    x.future <- Clim.BGCs.BC.future[which(BGCs.future==bgc.focal & scenario$rcp==rcp & scenario$proj.year==proj.year), which(variables==var1)]
+    y.future <- Clim.BGCs.BC.future[which(BGCs.future==bgc.focal & scenario$rcp==rcp & scenario$proj.year==proj.year), which(variables==var2)]
+    z.future <- Clim.BGCs.BC.future[which(BGCs.future==bgc.focal & scenario$rcp==rcp & scenario$proj.year==proj.year), which(variables==var3)]
     
     if(input$focal1 != "none"){
       x1 <- Clim.sample.BC[which(BGCs.sample.BC==input$focal1), which(variables==var1)] 
@@ -505,6 +567,36 @@ server <- function(input, output) {
   # height=reactive(ifelse(!is.null(input$innerWidth),input$innerWidth*0.4,0))
   )
   
+  #-------------------------
+  # Find-a-BEC
+  #-------------------------
+  
+  # showbgc <- "BGxh1"
+  # showzone <- "BG"
+  
+  output$becmap <- renderLeaflet({
+    
+    showbgc <- input$showbgc
+    showzone <- input$showzone
+    
+    leaflet() %>% 
+      addTiles() %>% 
+      addProviderTiles("Esri.WorldImagery", group = "Satellite view") %>%
+      addProviderTiles("Esri.WorldTerrain", group = "Terrain only") %>%
+      addProviderTiles("Esri.WorldTopoMap", group = "Base map") %>%
+      fitBounds(lng1 = extent(bgc.simple)[1], lat1 = extent(bgc.simple)[3], lng2 = extent(bgc.simple)[2], lat2 = extent(bgc.simple)[4]) %>%
+      addLayersControl(
+        baseGroups = c("Base map", "Terrain only", "Satellite view"),
+        options = layersControlOptions(collapsed = FALSE),
+      ) %>%
+      addPolygons(data=bgc.simple[zone.maprecord == showzone,], fillColor = "red", color="red", smoothFactor = 0.2, fillOpacity = 0.4, weight=2, opacity=1)%>%
+      addPolygons(data=bgc.simple[bgc.maprecord == showbgc,], fillColor = "black", color="black", smoothFactor = 0.2, fillOpacity = 0.4, weight=2, opacity=1) 
+    
+  },
+  )
+  
+  
+  
 }
 
 
@@ -513,14 +605,17 @@ server <- function(input, output) {
 # Run the app ----
 shinyApp(ui = ui, server = server)
 
+# vars <- get(paste("vars", varsets[1], sep="."))
+# variables <- c("PC1", "PC2", "PC3", vars)
 # proj.year <- 2055
 # rcp <- "rcp45"
 # gcm <- "CESM1-CAM5"
-# var1 <- "MCMT"
-# var2 <- "MWMT"
-# var3 <- "PPT_JAS"
+# var1 <- variables[1]
+# var2 <- variables[2]
+# var3 <- variables[3]
 # x <- Clim.BGCs.BC[, which(variables==var1)]
 # y <- Clim.BGCs.BC[, which(variables==var2)]
 # z <- Clim.BGCs.BC[, which(variables==var3)]
 # BGCs <- as.character(BGCs.BC)
 # cols <- as.character(ColScheme.zone[match(zones.BC,zones)])
+# bgc.focal <- "BGxh1"
