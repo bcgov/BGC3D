@@ -1,22 +1,28 @@
+# # BGC3D
+# A shiny app for visualizing biogeoclimatic units in 3D climate space
+# 
+# Copyright 2021 Colin Mahony colin.mahony@gov.bc.ca
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+# http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 library(shiny)
-# library(shinyRGL)
 library(rgl)
-# library(RColorBrewer)
-# library(DT)
-# library(rgdal)
-# library(leaflet)
-# library(htmlwidgets)
-# library(leaflet.opacity)
 library(sf)
 library(leaflet)
 library(leafem)
 library(htmlwidgets)
 library(leaflet.opacity)
 library(raster)
-# install.packages("devtools")
-# library(devtools)
-# install_github("rgl", "trestletech", "js-class")
-
 
 # ------------------------------------------
 # Load the input data
@@ -55,7 +61,7 @@ Clim.BGCs.WNA.all <- read.csv("data/Clim.BGCs.WNA.csv")[,-c(1:4)]
 Clim.BGCs.BC.2004.all <- read.csv("data/Clim.BGCs.BC.2004.csv")[,-c(1:4)]
 Clim.sample.BC.all <- read.csv("data/Clim.sample.BC.csv")[,-c(1:4)]
 Clim.sample.WNA.all <- read.csv("data/Clim.sample.WNA.csv")[,-c(1:4)]
-Clim.BGCs.BC.future.all <- read.csv("data/Clim.BGCs.BC.future.csv")[,-c(1:7)]
+Clim.BGCs.BC.future.all <- read.csv("data/Clim.BGCs.BC.future.csv")[,-c(1:6)]
 Clim.BGCs.BC.future.all <- Clim.BGCs.BC.future.all[which(names(Clim.BGCs.BC.future.all)%in%names(Clim.BGCs.BC.all))]
 
 # # reorder variables
@@ -496,6 +502,7 @@ server <- function(input, output) {
            alpha = 0.5,
            size=.5)
     
+    
     #BGC labels (bug in package means you need to overwrite a few times to get some to show)
     if(input$labels == T){
       text3d(x,y,z, BGCs.BC, adj=-0.2, font=2, cex=0.6)
@@ -553,13 +560,13 @@ server <- function(input, output) {
       rgl.lines(t(cbind(rep(x[which(BGCs.BC==input$focal)], length(x.future)),x.future)), t(cbind(rep(y[which(BGCs.BC==input$focal)], length(y.future)),y.future)), t(cbind(rep(z[which(BGCs.BC==input$focal)], length(z.future)),z.future)), color="black")
     }
     
-    rgl.viewpoint( theta = 0, phi = 0, fov = 60, zoom = 0.65 )
+    # rgl.viewpoint( theta = 0, phi = 0, fov = 60, zoom = 0.65 )
     
     axes3d(tick=F, xlab=var1, ylab=var2, zlab=var3, col="black")
     
     }
     
-    rglwidget()
+    rglwidget(reuse=T)
     
     
     
@@ -605,7 +612,7 @@ server <- function(input, output) {
 # Run the app ----
 shinyApp(ui = ui, server = server)
 
-# vars <- get(paste("vars", varsets[1], sep="."))
+# vars <- get(paste("vars", varsets[2], sep="."))
 # variables <- c("PC1", "PC2", "PC3", vars)
 # proj.year <- 2055
 # rcp <- "rcp45"
