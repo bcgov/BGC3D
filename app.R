@@ -1,7 +1,8 @@
 # # BGC3D
 # A shiny app for visualizing biogeoclimatic units in 3D climate space
-# 
-# Copyright 2021 Colin Mahony colin.mahony@gov.bc.ca
+# Colin Mahony colin.mahony@gov.bc.ca
+
+# Copyright 2021 Province of British Columbia
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.

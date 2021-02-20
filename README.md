@@ -4,7 +4,7 @@ A shiny app for visualizing biogeoclimatic units in 3D climate space
 <<<<<<< HEAD
 Currently hosted at https://bcgov-env.shinyapps.io/BGC3D/ 
 
-Copyright 2021 Colin Mahony
+Copyright 2021 Province of British Columbia
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
