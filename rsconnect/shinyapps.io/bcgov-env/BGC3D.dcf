@@ -5,8 +5,8 @@ account: bcgov-env
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 3549127
-bundleId: 4190192
+bundleId: 4333708
 url: https://bcgov-env.shinyapps.io/BGC3D/
-when: 1612654604.15863
+when: 1615514603.24362
 asMultiple: FALSE
 asStatic: FALSE

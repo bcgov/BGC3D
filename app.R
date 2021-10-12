@@ -155,7 +155,7 @@ ui <- fluidPage(
                                  selectInput("focalWNA", 
                                              label = "show spatial range of a non-BC BGC unit",
                                              choices = as.list(c("none", as.character(BGCs.WNA))),
-                                             selected = "none"),
+                                             selected = "CRFdh_CA"),
                                  
                                ),
                                
@@ -167,7 +167,7 @@ ui <- fluidPage(
                                             choices = list("Basic" = 1, "CBST" = 2, "CCISS"=3),
                                             selected = 1),
                                
-                               checkboxInput("iso", label = "Equal-scale axes (recommended for PCs)", value = FALSE),
+                               checkboxInput("iso", label = "Equal-scale axes (recommended for PCs)", value = TRUE),
                                
                                checkboxInput("biplot", label = "Show variable correlations", value = FALSE),
                                
@@ -222,7 +222,7 @@ ui <- fluidPage(
                                  selectInput("focal", 
                                              label = "Choose a focal BGC unit",
                                              choices = as.list(c(as.character(BGCs.BC))),
-                                             selected = "BGxh1"),
+                                             selected = "CDFmm"),
                                  
                                  radioButtons("proj.year", inline = T,
                                               label = "Choose a future period",
@@ -397,12 +397,14 @@ server <- function(input, output) {
         z2 <- Geog.sample.BC[which(BGCs.sample.BC==input$focal2), 3] 
       }
       
-      if(input$focalWNA != "none"){
+      if(input$exotic == TRUE){
+        if(input$focalWNA != "none"){
         x3 <- Geog.sample.WNA[which(BGCs.sample.WNA==input$focalWNA), 1] 
         y3 <- Geog.sample.WNA[which(BGCs.sample.WNA==input$focalWNA), 2] 
         z3 <- Geog.sample.WNA[which(BGCs.sample.WNA==input$focalWNA), 3] 
       }
-      
+      }
+        
       #core plot with BGC centroids
       plot3d(x,y,z, xlab="Longitude", ylab="Latitude", zlab="Elevation",
              type="s",
@@ -441,8 +443,10 @@ server <- function(input, output) {
         plot3d(x2,y2,z2, col=cols[which(BGCs.BC==input$focal2)], type="s",size=0.2, alpha=0.4, add=T)
       }
       
-      if(input$focalWNA != "none"){
+      if(input$exotic == T){
+        if(input$focalWNA != "none"){
         plot3d(x3,y3,z3, col=cols.WNA[which(BGCs.WNA==input$focalWNA)], type="s",size=0.2, alpha=0.4, add=T)
+      }
       }
       
       rgl.viewpoint( theta = 0, phi = 0, fov = 60, zoom = 0.65 )
@@ -487,10 +491,12 @@ server <- function(input, output) {
       z2 <- Clim.sample.BC[which(BGCs.sample.BC==input$focal2), which(variables==var3)] 
     }
     
-    if(input$focalWNA != "none"){
+    if(input$exotic == TRUE){
+      if(input$focalWNA != "none"){
       x3 <- Clim.sample.WNA[which(BGCs.sample.WNA==input$focalWNA), which(variables==var1)] 
       y3 <- Clim.sample.WNA[which(BGCs.sample.WNA==input$focalWNA), which(variables==var2)] 
       z3 <- Clim.sample.WNA[which(BGCs.sample.WNA==input$focalWNA), which(variables==var3)] 
+    }
     }
     
     cols <- as.character(ColScheme.zone[match(zones.BC,zones)]) 
@@ -549,8 +555,10 @@ server <- function(input, output) {
       plot3d(x2,y2,z2, col=cols[which(BGCs.BC==input$focal2)], type="s",size=0.2, alpha=0.4, add=T)
     }
     
-    if(input$focalWNA != "none"){
+    if(input$exotic == T){
+      if(input$focalWNA != "none"){
       plot3d(x3,y3,z3, col=cols.WNA[which(BGCs.WNA==input$focalWNA)], type="s",size=0.2, alpha=0.4, add=T)
+    }
     }
     
     if(input$iso==T) aspect3d("iso")
