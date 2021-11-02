@@ -1,6 +1,8 @@
 # BGC3D
 A shiny app for visualizing biogeoclimatic units in 3D climate space
 
+[![Lifecycle:Stable](https://img.shields.io/badge/Lifecycle-Stable-97ca00)](<Redirect-URL>)
+
 <<<<<<< HEAD
 Currently hosted at https://bcgov-env.shinyapps.io/BGC3D/ 
 
